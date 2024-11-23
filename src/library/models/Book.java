@@ -1,4 +1,4 @@
-package ModelDaoclasses;
+package library.models;
 
 public class Book {
     private int bookId;
@@ -17,7 +17,7 @@ public class Book {
         this.status = status;
     }
 
-    public static String displayString(Book book) {
+    public String displayString(Book book) {
         int id = book.getBookId();
         String title = book.getTitle();
         String author = book.getAuthor();

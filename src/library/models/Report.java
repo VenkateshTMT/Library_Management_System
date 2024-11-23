@@ -1,4 +1,4 @@
-package ModelDaoclasses;
+package library.models;
 
 public class Report {
     private int bookId;
@@ -14,6 +14,7 @@ public class Report {
         this.daysOverDue = daysOverDue;
         this.lateFee = lateFee;
     }
+
     public int getBookId() {
         return bookId;
     }
@@ -35,7 +36,7 @@ public class Report {
     }
 
     public void setBorrowerName(String borrowerName) {
-       this.borrowerName = borrowerName;
+        this.borrowerName = borrowerName;
     }
 
     public long getDaysOverDue() {
@@ -56,7 +57,7 @@ public class Report {
 
     @Override
     public String toString() {
-        return "bookId: "+bookId+" title: "+title+" Borrower Name: "
-                +borrowerName+" Days OverDue: "+daysOverDue+" Late fee collected "+lateFee;
+        return "bookId: " + bookId + " title: " + title + " Borrower Name: "
+                + borrowerName + " Days OverDue: " + daysOverDue + " Late fee collected " + lateFee;
     }
 }

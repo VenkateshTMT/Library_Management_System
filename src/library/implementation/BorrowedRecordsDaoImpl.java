@@ -1,16 +1,23 @@
-package DaoImpl;
+package library.implementation;
 
-import LibraryInterfaces.BorrowedRecordsDao;
-import ModelDaoclasses.BorrowedRecords;
-import ModelDaoclasses.Report;
+import db.connection.GetConnection;
+import exeception.CustomExeception;
+import library.interfaces.BorrowedRecordsDao;
+import library.models.BorrowedRecords;
+import library.models.Report;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 
 public class BorrowedRecordsDaoImpl implements BorrowedRecordsDao {
+
+    private static final Logger logger = Logger.getLogger(BorrowedRecordsDaoImpl.class.getName());
 
     public static final String SELECT_RECORD = "select * from borrowed_books where bookId=? and userId=?";
 
@@ -21,23 +28,16 @@ public class BorrowedRecordsDaoImpl implements BorrowedRecordsDao {
     public static final String GENERATE_REPORT_QUERY = "select * from borrowed_books inner join " +
             "book on borrowed_books.bookId=book.bookId " +
             "inner join user on borrowed_books.userID=user.userId " +
-            "where borrowed_books.returnDate between ? and ? " +
+            "where borrowed_books.borrowedDate between ? and ? " +
             "order by borrowed_books.userId";
 
     Connection connection = null;
 
     public BorrowedRecordsDaoImpl() {
-        String url = "jdbc:mysql://localhost:3306/library_management";
-        String username = "root";
-        String password = "root";
-        try {
-            connection = DriverManager.getConnection(url, username, password);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        connection= GetConnection.makeConnection();
     }
 
-
+    @Override
     public int recordBorrowing(int userId, int bookId) {
         PreparedStatement pstmt;
         Date currentDate = Date.valueOf(LocalDate.now());
@@ -50,12 +50,15 @@ public class BorrowedRecordsDaoImpl implements BorrowedRecordsDao {
             pstmt.setDate(4, null);
             pstmt.setBigDecimal(5, null);
             count = pstmt.executeUpdate();
+            logger.info("Successfully recorded borrowing for User ID: " + userId + " and Book ID: " + bookId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe("Error while recording borrowing: " + e.getMessage());
+            throw new CustomExeception(e.getMessage());
         }
         return count;
     }
 
+    @Override
     public BorrowedRecords getRecord(int bookId, int userId) {
         PreparedStatement pstmt;
         ResultSet res;
@@ -72,11 +75,13 @@ public class BorrowedRecordsDaoImpl implements BorrowedRecordsDao {
                 return new BorrowedRecords(borrowId, bookId, userId, borrowedDate, returnDate, lateFee);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe("Error while fetching borrowed record for User ID: " + userId + " and Book ID: " + bookId + " - " + e.getMessage());
+            throw new CustomExeception(e.getMessage());
         }
         return null;
     }
 
+    @Override
     public void returnBook(double lateFee, Date returnDate, int bookId, int userId) {
         PreparedStatement pstmt;
         try {
@@ -86,19 +91,34 @@ public class BorrowedRecordsDaoImpl implements BorrowedRecordsDao {
             pstmt.setInt(3, bookId);
             pstmt.setInt(4, userId);
             pstmt.executeUpdate();
+            logger.info("Successfully returned book for User ID: " + userId + " and Book ID: " + bookId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe("Error while returning book for User ID: " + userId + " and Book ID: " + bookId + " - " + e.getMessage());
+            throw new CustomExeception(e.getMessage());
         }
     }
 
-    private long overDueDays(Date startDate, Date endDate) {
-        LocalDate startLocalDate = startDate.toLocalDate();
-        LocalDate endLocalDate = endDate.toLocalDate();
-        long days = ChronoUnit.DAYS.between(startLocalDate, endLocalDate);
-        if (days>37){
-            return days - 37;
+
+    private long overDueDays(Date borrowedDate, Date returnDate) {
+        LocalDate startLocalDate = borrowedDate.toLocalDate();
+        LocalDate currentDate = LocalDate.now();
+        long days = 0;
+        if (returnDate == null) {
+            days = ChronoUnit.DAYS.between(startLocalDate, currentDate);
+            if (days > 37) {
+                days -= 37;
+            } else {
+                days = 0;
+            }
+        } else {
+            days = ChronoUnit.DAYS.between(startLocalDate, returnDate.toLocalDate());
+            if (days > 37) {
+                days -= 37;
+            } else {
+                days = 0;
+            }
         }
-       return 0;
+        return days;
     }
 
     @Override
@@ -111,34 +131,26 @@ public class BorrowedRecordsDaoImpl implements BorrowedRecordsDao {
             pstmt.setString(1, startDate);
             pstmt.setString(2, endDate);
             res = pstmt.executeQuery();
+            double lateFee;
             while (res.next()) {
                 int bookId = res.getInt("bookId");
                 String title = res.getString("title");
                 String userName = res.getString("name");
-                double lateFee = res.getDouble("lateFee");
+                lateFee = res.getDouble("lateFee");
                 Date borrowedDate = res.getDate("borrowedDate");
                 Date returnedDate = res.getDate("returnDate");
                 long daysOverDue = overDueDays(borrowedDate, returnedDate);
+                if (returnedDate == null && daysOverDue > 0) {
+                    lateFee = Math.min(daysOverDue * 0.5, 20);
+                }
                 Report report = new Report(bookId, title, userName, daysOverDue, lateFee);
                 reportsList.add(report);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe("Error while generating report: " + e.getMessage());
+            throw new CustomExeception(e.getMessage());
         }
         return reportsList;
     }
-
-    public void closeBorrowedRecordsConnection() {
-        try {
-            if (connection != null) {
-                connection.close();
-            } else {
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
 
 }

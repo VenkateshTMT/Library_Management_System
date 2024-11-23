@@ -1,4 +1,4 @@
-package LibraryInterfaces;
+package library.interfaces;
 
 public interface UserDao {
 }

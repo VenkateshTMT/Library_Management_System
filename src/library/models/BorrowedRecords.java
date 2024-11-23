@@ -1,4 +1,4 @@
-package ModelDaoclasses;
+package library.models;
 
 import java.sql.Date;
 
@@ -10,7 +10,8 @@ public class BorrowedRecords {
     private Date returnDate;
     private double lateFee;
 
-    public BorrowedRecords(){}
+    public BorrowedRecords() {
+    }
 
     public BorrowedRecords(int borrowId, int bookId, int userId, Date borrowDate, Date returnDate, double lateFee) {
         this.borrowId = borrowId;
@@ -71,8 +72,8 @@ public class BorrowedRecords {
 
     @Override
     public String toString() {
-        return "borrowedId: "+borrowId+" bookId: "+bookId
-                +" userId: "+userId+" borrowedDate: "+borrowDate+" returnDate: "+returnDate
-                +" late fee: "+lateFee;
+        return "borrowedId: " + borrowId + " bookId: " + bookId
+                + " userId: " + userId + " borrowedDate: " + borrowDate + " returnDate: " + returnDate
+                + " late fee: " + lateFee;
     }
 }

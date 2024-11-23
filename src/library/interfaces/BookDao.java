@@ -1,6 +1,6 @@
-package LibraryInterfaces;
+package library.interfaces;
 
-import ModelDaoclasses.Book;
+import library.models.Book;
 
 import java.util.List;
 
@@ -13,11 +13,10 @@ public interface BookDao {
 
     List<Book> getAllAvailableBooks();
 
-    void updateBookOnBorrow(int bookId);
+    int updateBookOnBorrow(int bookId);
 
     void updateBookOnReturn(int bookId);
 
     Book getSpecificBookTitle(String title);
 
-    void closeBookConnection();
 }
