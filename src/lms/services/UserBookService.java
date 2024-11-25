@@ -152,7 +152,7 @@ public class UserBookService {
             borrowedDate = record.getBorrowDate().toLocalDate();
             days = ChronoUnit.DAYS.between(borrowedDate, returnDate);
         } catch (DateTimeParseException e) {
-            //System.out.println("Enter valid Date format " + e.getMessage());
+            System.out.println("Enter valid Date format " + e.getMessage());
             throw new CustomExeception(e.getMessage());
         }
 
@@ -202,9 +202,8 @@ public class UserBookService {
                 System.out.println("Total late fees collected: $" + totalLateFee);
             }
 
-
         } catch (Exception e) {
-            //System.out.println("Enter valid Date format " + e.getMessage());
+            System.out.println("Enter valid Date format " + e.getMessage());
             throw new CustomExeception(e.getMessage());
         }
 

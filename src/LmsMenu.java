@@ -69,6 +69,7 @@ public class LmsMenu {
                         break;
                 }
             }catch(Exception e){
+                System.out.println(e.getMessage());
                 throw new CustomExeception(e.getMessage());
             }
         }

@@ -13,16 +13,6 @@ public class BookService {
     public static final Scanner input = new Scanner(System.in);
     public static BookDao bookObject = new BookDaoImpl();
 
-    /* public static void searchForBook(){
-        System.out.println("Enter the id");
-        Book book=bookObject.getBook(Main.input.nextInt());
-        if (book!=null){
-            System.out.println(book);
-        }else{
-            System.out.println("book not found");
-        }
-    }*/
-
     //3 Search for Book operation
     public static void searchForBook() {
         try{
@@ -39,11 +29,6 @@ public class BookService {
         }
 
     }
-
-    /*public static void getAllBooks() {
-        List<Book> libraryBooksList = bookObject.getAllBooks();
-        libraryBooksList.stream().forEach(each-> System.out.println(each));
-    }*/
 
     //4 check Available books
     public static void checkAvailableBooks() {

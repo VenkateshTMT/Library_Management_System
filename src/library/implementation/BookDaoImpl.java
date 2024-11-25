@@ -103,7 +103,7 @@ public class BookDaoImpl implements BookDao {
                 String title = res.getString("title");
                 String author = res.getString("author");
                 status = res.getString("status");
-                return new Book(bookId, title, author, status);
+                return new Book(bookId,title,author,status);
             }
         } catch (SQLException e) {
             //System.out.println(e.getMessage());
