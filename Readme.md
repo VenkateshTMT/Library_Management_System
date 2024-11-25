@@ -82,7 +82,7 @@ Input:
 
    Validation:
 
-   -> Ensure the K=keyword is not empty
+   -> Ensure the keyword is not empty
 
 Output:
 
